@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>깔끔한 하트 화면</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #fff5f7; /* 부드러운 핑크빛 배경 */
+            width: 100%;
+            height: 100%;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const heartTypes = ['❤️', '💖', '💝', '💕', '💗'];
+        const particles = [];
+
+        class HeartParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.text = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+                
+                // 요청하신 시원시원한 하트 크기 (25px ~ 45px)
+                this.size = Math.random() * 20 + 25; 
+                
+                // 일정하게 위로 떠오르는 속도
+                this.speedX = (Math.random() - 0.5) * 1.2;
+                this.speedY = -(Math.random() * 1.5 + 0.8);
+                
+                this.opacity = 1;
+                this.fadeSpeed = Math.random() * 0.006 + 0.003; 
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= this.fadeSpeed;
+            }
+
+            draw() {
+                ctx.save();
+                // 부드러운 투명도 대신 선명하게 그리되, 수명이 다하면 바로 삭제되도록 유도
+                ctx.globalAlpha = Math.max(0, this.opacity);
+                ctx.font = `${this.size}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        function animate() {
+            // 잔상 효과 제거: 매 프레임마다 배경을 깨끗하게 새로 지웁니다.
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff5f7';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 적당하고 풍성한 빈도로 하트 생성
+            if (Math.random() < 0.35) { 
+                const rx = Math.random() * canvas.width;
+                const ry = canvas.height + 30;
+                particles.push(new HeartParticle(rx, ry));
+            }
+
+            if (Math.random() < 0.15) {
+                const rx = Math.random() * canvas.width;
+                const ry = Math.random() * canvas.height;
+                particles.push(new HeartParticle(rx, ry));
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+
+                // 수명이 다한 하트는 즉시 배열에서 제거
+                if (particles[i].opacity <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
