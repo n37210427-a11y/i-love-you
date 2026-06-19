@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>깔끔한 하트 화면</title>
+    <title>초대형 깔끔 하트 화면</title>
     <style>
         body, html {
             margin: 0;
@@ -44,15 +44,19 @@
                 this.y = y;
                 this.text = heartTypes[Math.floor(Math.random() * heartTypes.length)];
                 
-                // 요청하신 시원시원한 하트 크기 (25px ~ 45px)
-                this.size = Math.random() * 20 + 25; 
+                // --- 핵심 수정: 하트 크기를 극단적으로 키움 ---
+                // 화면 너비의 30%에서 70% 사이의 거대한 크기로 설정
+                const minSize = Math.min(canvas.width, canvas.height) * 0.3;
+                const maxSize = Math.min(canvas.width, canvas.height) * 0.7;
+                this.size = Math.random() * (maxSize - minSize) + minSize; 
                 
-                // 일정하게 위로 떠오르는 속도
-                this.speedX = (Math.random() - 0.5) * 1.2;
-                this.speedY = -(Math.random() * 1.5 + 0.8);
+                // 거대한 하트가 천천히 웅장하게 움직이도록 속도 설정
+                this.speedX = (Math.random() - 0.5) * 1;
+                this.speedY = -(Math.random() * 1 + 0.5);
                 
                 this.opacity = 1;
-                this.fadeSpeed = Math.random() * 0.006 + 0.003; 
+                // 크기가 큰 만큼 더 천천히 사라지도록 설정 (더 오래 화면에 머뭄)
+                this.fadeSpeed = Math.random() * 0.002 + 0.001; 
             }
 
             update() {
@@ -63,8 +67,10 @@
 
             draw() {
                 ctx.save();
-                // 부드러운 투명도 대신 선명하게 그리되, 수명이 다하면 바로 삭제되도록 유도
+                // 깔끔한 효과를 위해 투명도를 적용하되, 수명이 다하면 바로 삭제되도록 유도
                 ctx.globalAlpha = Math.max(0, this.opacity);
+                
+                // 폰트 크기를 거대하게 설정
                 ctx.font = `${this.size}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -79,14 +85,17 @@
             ctx.fillStyle = '#fff5f7';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 적당하고 풍성한 빈도로 하트 생성
-            if (Math.random() < 0.35) { 
+            // 거대한 하트가 화면을 너무 꽉 채우지 않도록 생성 빈도를 조절
+            // 화면 밑에서 솟아오르는 하트 빈도
+            if (Math.random() < 0.1) { 
                 const rx = Math.random() * canvas.width;
-                const ry = canvas.height + 30;
+                // 거대한 하트가 화면 밑에서 완전히 올라오도록 시작 위치 조절
+                const ry = canvas.height + Math.min(canvas.width, canvas.height) * 0.5;
                 particles.push(new HeartParticle(rx, ry));
             }
 
-            if (Math.random() < 0.15) {
+            // 화면 중간에서도 간혹 생성
+            if (Math.random() < 0.02) {
                 const rx = Math.random() * canvas.width;
                 const ry = Math.random() * canvas.height;
                 particles.push(new HeartParticle(rx, ry));
